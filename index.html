@@ -11,6 +11,40 @@
 <div class="tsd-page-title">
 <h2>moleculer-encryption-middleware - v0.1.0</h2></div>
 <div class="tsd-panel tsd-typography"><p>WIP</p>
+
+<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+  <h3>Installation</h3>
+</a>
+<pre><code><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-0">i</span><span class="hl-1"> </span><span class="hl-0">moleculer</span><span class="hl-1">-</span><span class="hl-0">encryption</span><span class="hl-1">-</span><span class="hl-0">middleware</span>
+</code></pre>
+
+<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+  <h3>Usage</h3>
+</a>
+<pre><code class="language-typescript"><span class="hl-2">// moleculer.config.js</span><br/><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-0">encryptionMiddleware</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-4">&quot;moleculer-encryption-middleware&quot;</span><span class="hl-1">;</span><br/><span class="hl-2">//or with require</span><br/><span class="hl-2">//const { encryptionMiddleware } = require(&quot;moleculer-encryption-middleware&quot;);</span><br/><br/><span class="hl-5">module</span><span class="hl-1">.</span><span class="hl-5">exports</span><span class="hl-1"> = {</span><br/><span class="hl-1">  </span><span class="hl-0">middlewares:</span><span class="hl-1"> [</span><br/><span class="hl-1">      </span><span class="hl-6">encryptionMiddleware</span><span class="hl-1">({</span><br/><span class="hl-1">          </span><span class="hl-0">password:</span><span class="hl-1"> </span><span class="hl-0">Buffer</span><span class="hl-1">.</span><span class="hl-6">from</span><span class="hl-1">(</span><span class="hl-4">&quot;67544A58287C12EB654D0B6C14A5B36EC5916BD5A31BD7AD8F5B826B7C35A7D8&quot;</span><span class="hl-1">, </span><span class="hl-4">&quot;hex&quot;</span><span class="hl-1">)</span><br/><span class="hl-1">      })</span><br/><span class="hl-1">  ]</span><br/><span class="hl-1">};</span>
+</code></pre>
+
+<a href="#available-options" id="available-options" style="color: inherit; text-decoration: none;">
+  <h3>Available options</h3>
+</a>
+<ul>
+<li>password: Buffer | string | Uint8Array<ul>
+<li>need to be a 32 bytes long Buffer or a string that will be sha256 hashed</li>
+</ul>
+</li>
+<li>algorithm: string : algorithm to use for encryption (default: &#39;aes-256-cbc&#39;)<ul>
+<li>algorithm to use for encryption</li>
+</ul>
+</li>
+<li>IVPosition: number : initialization vector position<ul>
+<li>need to be the same for all nodes (more secure to specify it, better with a small value)</li>
+</ul>
+</li>
+<li>IVLength: number : length of the initialization vector (default: 16)<ul>
+<li>length of the initialization vector, mandatory for node &lt; 15.x (16 for aes-256-cbc)</li>
+</ul>
+</li>
+</ul>
 </div></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
