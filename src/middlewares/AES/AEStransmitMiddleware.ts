@@ -1,21 +1,12 @@
 import Moleculer from 'moleculer';
 import crypto from 'crypto';
+import { EncryptionMiddleware } from '../../Interfaces/EncryptionMiddleware';
+import { IAESTransmitMiddlewareOptionalOptions } from './IAESTransmitMiddlewareOptionalOptions';
+import { IAESTransmitMiddlewareMandatoryOptions } from './IAESTransmitMiddlewareMandatoryOptions';
+import { IAESTransmitMiddlewareOptions } from './IAESTransmitMiddlewareOptions';
 import MoleculerError = Moleculer.Errors.MoleculerError;
-import { EncryptionMiddleware } from './Interfaces/EncryptionMiddleware';
 
 const _privateMap = new WeakMap();
-
-export interface IAESTransmitMiddlewareOptionalOptions {
-    algorithm: string;
-    IVPosition: number;
-    IVLength: number;
-}
-
-export interface IAESTransmitMiddlewareMandatoryOptions {
-    password: string | Buffer;
-}
-
-export type IAESTransmitMiddlewareOptions = IAESTransmitMiddlewareMandatoryOptions & Partial<IAESTransmitMiddlewareOptionalOptions>;
 
 const defaultOptions: IAESTransmitMiddlewareOptionalOptions = {
     algorithm: 'aes-256-cbc',
@@ -23,7 +14,7 @@ const defaultOptions: IAESTransmitMiddlewareOptionalOptions = {
     IVLength: 16
 };
 
-export class AESTransmitMiddleware implements EncryptionMiddleware {
+export class AEStransmitMiddleware implements EncryptionMiddleware {
     private logger: Moleculer.LoggerInstance;
     get encryptionKey(): Buffer {
         return this.getPrivate<Buffer>('encryptionKey');

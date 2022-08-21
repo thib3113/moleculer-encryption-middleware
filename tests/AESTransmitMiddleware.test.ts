@@ -1,19 +1,19 @@
 import { Buffer } from 'buffer';
 import { ServiceBroker } from 'moleculer';
-import { AESTransmitMiddleware } from '../src/a-e-s-transmit-middleware';
+import { AEStransmitMiddleware } from '../src/middlewares/AES';
 
 describe('Test AESTransmitMiddleware', () => {
     const broker = new ServiceBroker({ logger: false });
     const password = 'mw-test';
 
     it('should export function', () => {
-        const mw = new AESTransmitMiddleware(broker.logger, { password });
+        const mw = new AEStransmitMiddleware(broker.logger, { password });
         expect(mw.encrypt).toBeInstanceOf(Function);
         expect(mw.decrypt).toBeInstanceOf(Function);
     });
 
     it('should keep same data with encrypt/decrypt', () => {
-        const mw = new AESTransmitMiddleware(broker.logger, { password });
+        const mw = new AEStransmitMiddleware(broker.logger, { password });
 
         const testString = 'moleculer';
         const testBuffer = Buffer.from(testString);

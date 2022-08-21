@@ -6,7 +6,7 @@
     "allowJs": true,
     "esModuleInterop": true,
     "declaration": true,
-    "outDir": "build",
+    "outDir": "lib",
     "strictNullChecks": true,
     "experimentalDecorators": true,
     "skipLibCheck": true,
