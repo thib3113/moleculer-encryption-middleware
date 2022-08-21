@@ -23,7 +23,6 @@
     "prettier": "2.7.1",
     "ts-jest": "28.0.8",
     "ts-node": "10.9.1",
-    "typedoc": "0.23.10",
     "typescript": "4.7.4"
   },
   "scripts": {
@@ -32,7 +31,7 @@
     "build:prod": "tsc -p tsconfig.build.json",
     "lint": "eslint -f unix \"src/**\"",
     "prepublishOnly": "npm run build:prod",
-    "ci:generate:documentation": "typedoc",
+    "ci:generate:documentation": "npx typedoc",
     "ci:test:coverage": "jest --ci --coverage",
     "ci:eslint": "npm run lint -- -f json -o ./coverage/eslint-report.json",
     "test": "jest"
