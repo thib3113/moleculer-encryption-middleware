@@ -1,0 +1,26 @@
+{
+  "extends": "@tsconfig/node12/tsconfig.json",
+  "compilerOptions": {
+    "declarationDir": "@types",
+    "sourceMap": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "outDir": "build",
+    "strictNullChecks": true,
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "types": [
+      "node",
+      "jest"
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    "tests"
+  ],
+  "include": [
+    "src/**/*.ts"
+  ]
+}
