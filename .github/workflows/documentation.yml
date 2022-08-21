@@ -27,6 +27,7 @@ jobs:
       # run npm tests
       - name: npm install, build, and test
         run: |
+          npm i -g typescript typedoc
           npm install
           npm run ci:generate:documentation
         env:
