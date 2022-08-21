@@ -4,7 +4,7 @@ import { EncryptionMiddleware } from './Interfaces/EncryptionMiddleware';
 import Moleculer, { CallMiddlewareHandler } from 'moleculer';
 import MoleculerError = Moleculer.Errors.MoleculerError;
 
-// export * from './middlewares/AES';
+export * from './middlewares/AES';
 
 export type encryptionMiddlewareOptions = IAESTransmitMiddlewareOptions & { throwError?: boolean };
 

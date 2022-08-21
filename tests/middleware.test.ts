@@ -2,7 +2,7 @@ import { ServiceBroker, Middleware, CallMiddlewareHandler } from 'moleculer';
 import middleware, { encryptionMiddlewareOptions } from '../src';
 import { AEStransmitMiddleware } from '../src/middlewares/AES';
 
-jest.mock('../src/a-e-s-transmit-middleware');
+jest.mock('../src/middlewares/AES');
 
 describe('Test EncryptionMiddleware', () => {
     const password = 'mw-test';
