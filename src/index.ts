@@ -1,12 +1,12 @@
-import { AEStransmitMiddleware, IAESTransmitMiddlewareOptions } from './middlewares/AES';
+import { SymmetricTransmitMiddleware, ISymmetricTransmitMiddlewareOptions } from './middlewares/Symmetric';
 import type { Middleware, Service } from 'moleculer';
 import { EncryptionMiddleware } from './Interfaces/EncryptionMiddleware';
 import Moleculer, { CallMiddlewareHandler } from 'moleculer';
 import MoleculerError = Moleculer.Errors.MoleculerError;
 
-export * from './middlewares/AES';
+export * from './middlewares/Symmetric';
 
-export type encryptionMiddlewareOptions = IAESTransmitMiddlewareOptions & { throwError?: boolean };
+export type encryptionMiddlewareOptions = ISymmetricTransmitMiddlewareOptions & { throwError?: boolean };
 
 export const encryptionMiddleware = (options: encryptionMiddlewareOptions): Middleware => {
     let middleware: EncryptionMiddleware | undefined;
@@ -17,7 +17,7 @@ export const encryptionMiddleware = (options: encryptionMiddlewareOptions): Midd
 
         created(this: Service) {
             logger = this.logger;
-            middleware = new AEStransmitMiddleware(this.logger, options);
+            middleware = new SymmetricTransmitMiddleware(this.logger, options);
 
             /* istanbul ignore next */
             this.logger.info(`The transmission is ENCRYPTED with algorithm '${middleware.getAlgorithm()}'.`);

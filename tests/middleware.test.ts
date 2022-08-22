@@ -1,6 +1,6 @@
 import { ServiceBroker, Middleware, CallMiddlewareHandler } from 'moleculer';
 import middleware, { encryptionMiddlewareOptions } from '../src';
-import { AEStransmitMiddleware } from '../src/middlewares/AES';
+import { SymmetricTransmitMiddleware } from '../src/middlewares/AES';
 
 jest.mock('../src/middlewares/AES');
 
@@ -35,7 +35,7 @@ describe('Test EncryptionMiddleware', () => {
             // @ts-ignore
             mw.created.bind(broker)();
 
-            expect(AEStransmitMiddleware).toBeCalledWith(expect.anything(), expect.objectContaining(options));
+            expect(SymmetricTransmitMiddleware).toBeCalledWith(expect.anything(), expect.objectContaining(options));
         });
     });
 
@@ -62,7 +62,7 @@ describe('Test EncryptionMiddleware', () => {
             const data = 'data';
             await send('topic', Buffer.from(data), {});
 
-            const dataPassedToEncrypt: Buffer = (AEStransmitMiddleware.prototype.encrypt as jest.Mock).mock.calls[0][0];
+            const dataPassedToEncrypt: Buffer = (SymmetricTransmitMiddleware.prototype.encrypt as jest.Mock).mock.calls[0][0];
             expect(dataPassedToEncrypt).toBeInstanceOf(Buffer);
             expect(dataPassedToEncrypt.toString()).toBe(data);
         });

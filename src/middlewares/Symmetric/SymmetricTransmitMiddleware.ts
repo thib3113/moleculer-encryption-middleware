@@ -1,20 +1,21 @@
 import Moleculer from 'moleculer';
-import crypto from 'crypto';
+import crypto, { CipherCCMOptions, CipherGCMOptions, CipherOCBOptions } from 'crypto';
 import { EncryptionMiddleware } from '../../Interfaces/EncryptionMiddleware';
-import { IAESTransmitMiddlewareOptionalOptions } from './IAESTransmitMiddlewareOptionalOptions';
-import { IAESTransmitMiddlewareMandatoryOptions } from './IAESTransmitMiddlewareMandatoryOptions';
-import { IAESTransmitMiddlewareOptions } from './IAESTransmitMiddlewareOptions';
+import { ISymmetricTransmitMiddlewareOptionalOptions } from './ISymmetricTransmitMiddlewareOptionalOptions';
+import { ISymmetricTransmitMiddlewareMandatoryOptions } from './ISymmetricTransmitMiddlewareMandatoryOptions';
+import { ISymmetricTransmitMiddlewareOptions } from './ISymmetricTransmitMiddlewareOptions';
+import stream from 'node:stream';
 import MoleculerError = Moleculer.Errors.MoleculerError;
 
 const _privateMap = new WeakMap();
 
-const defaultOptions: IAESTransmitMiddlewareOptionalOptions = {
+const defaultOptions: Partial<ISymmetricTransmitMiddlewareOptionalOptions> = {
     algorithm: 'aes-256-cbc',
     IVPosition: 4,
     IVLength: 16
 };
 
-export class AEStransmitMiddleware implements EncryptionMiddleware {
+export class SymmetricTransmitMiddleware implements EncryptionMiddleware {
     private logger: Moleculer.LoggerInstance;
     get encryptionKey(): Buffer {
         return this.getPrivate<Buffer>('encryptionKey');
@@ -26,10 +27,13 @@ export class AEStransmitMiddleware implements EncryptionMiddleware {
     private readonly algorithm: string;
     private readonly IVPosition: number;
     private readonly IVLength: number;
-    constructor(logger: Moleculer.LoggerInstance, options: IAESTransmitMiddlewareOptions) {
+    private readonly cipherOptions: CipherCCMOptions | CipherGCMOptions | CipherOCBOptions | stream.TransformOptions | undefined;
+    constructor(logger: Moleculer.LoggerInstance, options: ISymmetricTransmitMiddlewareOptions, skipManualValidation: boolean = false) {
         this.logger = logger;
-        const { password, IVPosition, IVLength, algorithm } = { ...defaultOptions, ...options } as IAESTransmitMiddlewareMandatoryOptions &
-            IAESTransmitMiddlewareOptionalOptions;
+        const { password, IVPosition, IVLength, algorithm } = {
+            ...defaultOptions,
+            ...options
+        } as ISymmetricTransmitMiddlewareMandatoryOptions & ISymmetricTransmitMiddlewareOptionalOptions;
 
         this.encryptionKey = typeof password === 'string' ? crypto.createHash('sha256').update(password).digest() : password;
 
@@ -39,55 +43,37 @@ export class AEStransmitMiddleware implements EncryptionMiddleware {
 
         const currentCipher = crypto.getCiphers().find((c) => c === algorithm);
         if (!currentCipher) {
-            throw new MoleculerError(`The algorithm '${algorithm}' is not supported.`);
-        }
-
-        let calculatedIVLength: number = 0;
-        // crypto.getCipherInfo only available in node v15+
-        if (crypto.getCipherInfo) {
-            const cipherInfos = crypto.getCipherInfo(currentCipher);
-            if (cipherInfos) {
-                if (this.encryptionKey.byteLength < cipherInfos.keyLength) {
-                    throw new MoleculerError(
-                        `The key is too short. The key need to contain ${cipherInfos.keyLength} bytes. (${this.encryptionKey.byteLength} bytes actually)`
-                    );
-                }
-                if (cipherInfos.ivLength && IVLength < cipherInfos.ivLength) {
-                    throw new MoleculerError(
-                        `The IVLength is too short. The key need to contain ${cipherInfos.ivLength} bytes. (${IVLength} actually)`
-                    );
-                }
-                calculatedIVLength = cipherInfos.ivLength || 0;
-            }
+            console.warn(`The algorithm '${algorithm}' is not supported.`);
         }
 
         this.algorithm = algorithm;
-        this.IVPosition = IVPosition;
-        if (!IVLength && !calculatedIVLength) {
-            throw new MoleculerError('Impossible to retrieve IVLength automatically . You must set an IVLength for encryption');
-        }
-        this.IVLength = IVLength || calculatedIVLength;
+        this.IVPosition = ~~IVPosition;
+        this.IVLength = ~~IVLength;
+        this.cipherOptions = options.cipherOptions;
 
-        //do an encryption test (depends on the computer running the script)
-        try {
-            const testString = 'moleculer';
-            if (this.decrypt(this.encrypt(Buffer.from(testString))).toString() !== testString) {
-                throw new MoleculerError('Fail to encrypt/decrypt and get the same string');
+        //bad way to do ... but it's a nightmare to tests
+        if (!skipManualValidation) {
+            //do an encryption test (depends on the computer running the script)
+            try {
+                const testString = 'moleculer';
+                if (this.decrypt(this.encrypt(Buffer.from(testString))).toString() !== testString) {
+                    throw new MoleculerError('Fail to encrypt/decrypt and get the same string');
+                }
+            } catch (e) {
+                throw new MoleculerError(`Encryption test failed : ${(e as Error).message}`);
             }
-        } catch (e) {
-            throw new MoleculerError(`Encryption test failed : ${(e as Error).message}`);
         }
     }
 
     public encrypt(data: Buffer): Buffer {
         const iv = crypto.randomBytes(this.IVLength);
-        const cipher = crypto.createCipheriv(this.algorithm, this.encryptionKey, iv);
+        const cipher = crypto.createCipheriv(this.algorithm, this.encryptionKey, iv, this.cipherOptions);
         return this.insertIV(Buffer.concat([cipher.update(data), cipher.final()]), iv);
     }
 
     public decrypt(message: Buffer): Buffer {
         const [iv, data] = this.extractIV(message);
-        const decipher = crypto.createDecipheriv(this.algorithm, this.encryptionKey, iv);
+        const decipher = crypto.createDecipheriv(this.algorithm, this.encryptionKey, iv, this.cipherOptions);
         return Buffer.concat([decipher.update(data), decipher.final()]);
     }
 
@@ -109,7 +95,7 @@ export class AEStransmitMiddleware implements EncryptionMiddleware {
     }
 
     private getIVPosition(data: Buffer): number {
-        return this.IVPosition < data.byteLength ? this.IVPosition : data.byteLength - 1;
+        return this.IVPosition < data.byteLength ? this.IVPosition : 1;
     }
 
     public getAlgorithm(): string {
