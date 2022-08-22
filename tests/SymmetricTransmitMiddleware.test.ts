@@ -55,60 +55,21 @@ describe('Test SymmetricTransmitMiddleware', () => {
                 expect((e as Error).message).toBe('You must set a password for encryption');
             }
         });
-        it("should throw error if no cipher doesn't exist is provided", () => {
-            expect.assertions(2);
-
-            try {
-                // @ts-ignore
-                new SymmetricTransmitMiddleware(broker.logger, { ...options, algorithm: 'tutu' });
-            } catch (e) {
-                expect(e).toBeInstanceOf(Error);
-                expect((e as Error).message).toBe("The algorithm 'tutu' is not supported.");
-            }
-        });
-        it('should throw error if fail to get IVLength', () => {
-            expect.assertions(2);
-
-            // @ts-ignore
-            mockCrypto.getCipherInfo = null;
-            try {
-                // @ts-ignore
-                new SymmetricTransmitMiddleware(broker.logger, { ...options, IVLength: 0 });
-            } catch (e) {
-                expect(e).toBeInstanceOf(Error);
-                expect((e as Error).message).toBe(
-                    'Impossible to retrieve IVLength automatically . You must set an IVLength for encryption'
-                );
-            }
-        });
-        it('should throw error if fail encrypt/decrypt', () => {
-            expect.assertions(2);
-
-            try {
-                // @ts-ignore
-                new SymmetricTransmitMiddleware(broker.logger, { ...options, IVLength: 0 });
-            } catch (e) {
-                expect(e).toBeInstanceOf(Error);
-                expect((e as Error).message).toBe(
-                    'Impossible to retrieve IVLength automatically . You must set an IVLength for encryption'
-                );
-            }
-        });
         describe('test getCipherInfo', () => {
             // TODO need node 16 to test it
         });
     });
 
-    describe('test functions', () => {
-        let mw: SymmetricTransmitMiddleware;
-        beforeEach(() => {
-            mw = new SymmetricTransmitMiddleware(broker.logger, { password });
-        });
-        it('should encrypt', () => {
-            const r = mw.encrypt(Buffer.from('moleculer'));
-            console.log(r);
-        });
-    });
+    // describe('test functions', () => {
+    //     let mw: SymmetricTransmitMiddleware;
+    //     beforeEach(() => {
+    //         mw = new SymmetricTransmitMiddleware(broker.logger, { password });
+    //     });
+    //     it('should encrypt', () => {
+    //         const r = mw.encrypt(Buffer.from('moleculer'));
+    //         console.log(r);
+    //     });
+    // });
 
     describe('test encryption', () => {
         describe('test encrypt/decrypt', () => {
